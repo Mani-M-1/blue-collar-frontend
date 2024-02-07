@@ -10,6 +10,7 @@ const ViewButton = () => {
 
   const isFocused = useIsFocused();
   const [jobDetails, setJobDetails]= useState({
+    jobId: '',
     companyName:'', 
     contactDetails: '',
     description:'', 
@@ -32,7 +33,7 @@ const ViewButton = () => {
   const getJobDetails = async () => {
    
     try {
-      const url = `http://localhost:8080/jobseeker/jobDetails/${jobId}`;
+      const url = `http://localhost:8080/jobprovider/jobDetails/${jobId}`;
       const response = await fetch(url);
       const data = await response.json();
   
@@ -40,6 +41,7 @@ const ViewButton = () => {
         alert(data.err_msg);
       } else if (data && data.jobDetails) {
         const {
+          _id,
           companyName,
           contactDetails,
           description,
@@ -49,8 +51,11 @@ const ViewButton = () => {
           salary,
           workHours,
         } = data.jobDetails;
+
+        console.log(data.jobDetails)
   
         setJobDetails({
+          jobId: _id,
           companyName,
           contactDetails,
           description,
@@ -102,7 +107,7 @@ return (
 
       {/* <Text style={{ padding: 20, fontWeight: 'bold', alignSelf: 'center' }}>Intersted Candidates Can ApplyHere</Text> */}
 
-      <Pressable style={styles.postjobbutton} onPress={() => navigation.navigate('AppliedList')}>
+      <Pressable style={styles.postjobbutton} onPress={() => navigation.navigate('AppliedList', {jobId: jobDetails.jobId})}>
         <Text style={{ color: 'white', fontSize: 20 }}>Candidates List</Text>
       </Pressable>
 

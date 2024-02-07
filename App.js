@@ -31,9 +31,9 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name='Register' component={Register} />
-        <Stack.Screen name='Welcome' component={Welcome} />
+        {/* <Stack.Screen name='Register' component={Register} />
         <Stack.Screen name='Signin' component={Signin} />
+        <Stack.Screen name='Welcome' component={Welcome} /> */}
         <Stack.Screen name='JobProvider' component={JobProvider} />
         <Stack.Screen name='ProviderDetails' component={ProviderDetails} /> 
         <Stack.Screen name='JobSeeker' component={JobSeeker} />
@@ -45,10 +45,10 @@ function App() {
         <Stack.Screen name='LogoutPage' component={LogoutPage} />
         <Stack.Screen name='EditableText' component={EditableText} />
         <Stack.Screen name='SekerDetails' component={SekerDetails} />
+        <Stack.Screen name='ViewButton' component={ViewButton} />
         <Stack.Screen name='ViewAll' component={ViewAll} />
         <Stack.Screen name='AppliedList' component={AppliedList} />
         <Stack.Screen name='ApplyHere' component={ApplyHere} />
-        <Stack.Screen name='ViewButton' component={ViewButton} />
 
 
 

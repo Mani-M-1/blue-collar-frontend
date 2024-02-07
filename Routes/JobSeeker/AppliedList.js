@@ -5,42 +5,91 @@ import { useNavigation , useRoute} from '@react-navigation/native';
 
 const AppliedList = () => {
     const navigation = useNavigation();
-    const { params } = useRoute();
-    const jobId = params?.jobId; 
-    const [userEmail, setUserEmail] = useState('');
+    const route = useRoute();
+    const { params } = route;
+    const {jobId} = params; 
+    console.log(`jobId: ${jobId}`) 
+    const [userArr, setUserArr] = useState([]);
+    // const [userEmail, setUserEmail] = useState('');
 
     const getUsersAppliedList = async () => {
-        try {
-           
-            const url = `http://localhost:8080/jobprovider/usersAppliedForJob/${jobId}`;
-            const response = await fetch(url);
-            const data = await response.json();
+        console.log(`jobId in func: ${jobId}`)
+        const url = `http://localhost:8080/jobprovider/usersAppliedForJob/${jobId}`;
+        const response = await fetch(url);
+        const data = await response.json();
 
-            if (!response.ok) {
-                alert(data.err_msg);
-            } else {
-                setUserEmail(data.userEmail);
-            }
-        } catch (error) {
-            console.error('Error fetching user data:', error);
+        if (!response.ok) {
+            alert(data.err_msg);
+        } else {
+            console.log(data.usersApplied);
+            setUserArr(data.usersApplied);
         }
     };
 
 
     useEffect(() => {
         getUsersAppliedList();
-    }, [jobId]); 
+    }, []); 
 
     
 
+
+    const UserItem = (props) => {
+        const {user} = props;
+        const {email} = user;
+
+
+        return (
+            <View style={styles.userCard}>
+                <Text>{email}</Text>
+                <View style={styles.profile}>
+                    {email[0].toUpperCase()}
+                </View>
+            </View>
+        )
+    }
+
+
+
+
     return (
-        <View>
-        <Text>User Email: {userEmail}</Text>
-      </View>
+        <View style={styles.mainCard}>
+            {userArr.map(user => <UserItem key={user._id} user={user}/>)}
+        </View>
 
     )
 
 }
+
+
+
+
+const styles = StyleSheet.create({
+    mainCard: {
+        padding: 10,
+    }, 
+    userCard: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: '15px',
+        paddingVertical: '10px',
+        borderColor: 'grey',
+        borderWidth: '2px',
+        borderRadius: '10px'
+    }, 
+    profile: {
+        width: 50,
+        height: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: "50%",
+        backgroundColor: 'teal'
+    }
+})
+
 
 
 export default AppliedList;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Pressable, Image } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
@@ -7,14 +7,21 @@ import { AntDesign } from '@expo/vector-icons';
 
 const ApplyHere = ({ route }) => {
     const navigation = useNavigation();
-    const { userEmail } = route.params;
+    // const { userEmail } = route.params;
 
     
-    const [text, setText] = useState('');
+    // const [text, setText] = useState('');
 
-    const changeHandler = (val) => {
-        setText(val);
-    }
+    // const changeHandler = (val) => {
+    //     setText(val);
+    // }
+
+    useEffect(() => {
+      setTimeout(() => {
+        navigation.navigate('JobSeeker')
+      }, 3000);
+    }, [])
+    
 
     return(
         <View style={styles.container}>
@@ -24,7 +31,7 @@ const ApplyHere = ({ route }) => {
 
             <Pressable
         style={styles.postjobbutton}
-        onPress={() => navigation.navigate('ViewAll', { userEmail })}
+        
       >
         <Text style={{ color: 'white', fontSize: 20 }}>View All</Text>
       </Pressable>

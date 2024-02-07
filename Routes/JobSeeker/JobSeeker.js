@@ -4,8 +4,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '../../Routes/JobSeeker/Searchbar';
 import { AntDesign } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
+import { Entypo } from "@expo/vector-icons";
 
 
 
@@ -22,68 +22,65 @@ const JobSeeker = () => {
   const [appliedJobs, setAppliedJobs] = useState([]);
 
 
-   const filteredJobs = jobs.filter((job) =>
-   job.jobTitle && job.jobTitle.toLowerCase().includes(searchQuery.toLowerCase())
-   );
+  const getAppliedJob = async () => {
+    const userId = localStorage.getItem('userId');
 
-  const getjobseeker = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/jobDetails/jobseekerid', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      else {
-        const data = await response.json();
-        console.log('getting the data successful:', data);
-        navigation.navigate('Signin')
-      }
-
-
-    } catch (error) {
-      console.error('Error while getting data:', error.message);
+    if (!userId) {
+      alert("userId does not exist");
     }
-  };
+    const url = `http://localhost:8080/jobseeker/jobsApplied/${userId}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    // console.log(data.jobs);
+    if (!response.ok) {
+      alert(data.err_msg);
+    }
+    else {
+      console.log(data.jobsApplied)
+      setAppliedJobs(data.jobsApplied)
+    }
+  }
+
 
 
   const getAllJobs = async () => {
     const url = "http://localhost:8080/jobseeker/allJobs";
     const response = await fetch(url);
     const data = await response.json();
-    console.log(data.jobs);
+    // console.log(data.jobs);
     if (!response.ok) {
       alert(data.err_msg);
     }
     else {
+      console.log(data.jobs)
       setJobs(data.jobs);
     }
   }
 
   useEffect(() => {
+    // for getting all jobs for recommondation
     getAllJobs();
+
+    // for getting jobs applied by the user
+    getAppliedJob();
   }, [])
 
     // Fetch applied jobs here and update the appliedJobs state
-    const fetchAppliedJobs = async () => {
-      try {
-        // Fetch applied jobs logic here
+  //   const fetchAppliedJobs = async () => {
+  //     try {
+  //       // Fetch applied jobs logic here
        
-        const url=`http://localhost:8080/jobseeker/jobsApplied/${userId}`;
-        const data = await response.json();
-        setAppliedJobs(data.appliedJobs);
-      } catch (error) {
-        console.error('Error while fetching applied jobs:', error.message);
-      }
-    };
+  //       const url=`http://localhost:8080/jobseeker/jobsApplied/${userId}`;
+  //       const data = await response.json();
+  //       setAppliedJobs(data.appliedJobs);
+  //     } catch (error) {
+  //       console.error('Error while fetching applied jobs:', error.message);
+  //     }
+  //   };
 
-    useEffect(() => {
-      fetchAppliedJobs();
-  }, [])
+  //   useEffect(() => {
+  //     fetchAppliedJobs();
+  // }, [])
 
   const RecommendeJobItem = (props) => {
     const { job } = props;
@@ -99,10 +96,26 @@ const JobSeeker = () => {
 
     return (
       <View style={styles.itemContainer}>
-        <Image style={styles.image} source={jobImage} />
         <Pressable style={styles.viewbutton} onPress={submitHandler}>
-          <Text style={{ fontWeight: "bold" }}>{jobTitle}</Text>
+          <Image style={styles.image} source={jobImage} />
+          <Text style={styles.jobTitle}>{jobTitle}</Text>
         </Pressable>
+      </View>
+    )
+  }
+
+
+
+  const AppliedJobItem = (props) => {
+    const { job } = props;
+    const { jobTitle, jobImage } = job;
+
+
+
+    return (
+      <View style={styles.itemContainer}>
+        <Image style={styles.image} source={jobImage} />
+        <Text style={styles.jobTitle}>{jobTitle}</Text>
       </View>
     )
   }
@@ -116,84 +129,91 @@ const JobSeeker = () => {
           <AntDesign name="profile" size={24} color="black" />
         </Pressable>
         <View style={styles.searchBarContainer}>
-          <SearchBar
+          <TextInput style={styles.input} placeholder="Search"/>
+          <Entypo
+            name="cross"
+            size={20}
+            color="black"
+            
+          />
+          {/* <SearchBar
             clicked={clicked}
             searchPhrase={searchQuery}
             setSearchPhrase={setSearchQuery}
             setClicked={setClicked}
-          />
+          /> */}
         </View>
         <Pressable onPress={() => navigation.navigate('Messages')}>
           <AntDesign name="message1" size={24} color="black" />
         </Pressable>
       </View>
 
-      {clicked ? (
-        <View style={styles.searchResultsContainer}>
-          {filteredJobs.map(job => <RecommendeJobItem key={job._id} job={job} />)}
-        </View>
-      ) : (
-        <>
+
+    
+
 
       {/*  this is about recommended for you  */}
-      <Text style={styles.Recommended}>Recommended For You</Text>
+      <Text style={styles.headers}>Recommended For You</Text>
 
       <View style={styles.jobsWrapper} >
-
-
         {jobs.map(job => <RecommendeJobItem key={job._id} job={job} />)}
-        {/* <View style={styles.itemContainer}>
-                <Image style={styles.image} source={require('../../assets/driver pic.jpeg')} />
-                <Pressable style={styles.viewbutton} onPress={() =>  submitHandler(text)}>
-                  <Text style={{fontWeight:"bold"}}>Driver Jobs</Text>
-                </Pressable>
-              </View> */}
       </View>
       
  
-
-      {appliedJobs.length > 0 && (
-            <>
-              <Text style={styles.applications}>Your Applications</Text>
-              <View style={styles.applicationsContainer}>
-                {appliedJobs.map(appliedJob => (
-                  <View key={appliedJob.id}>
-                    {/* Display applied job details */}
-                    <Text>{appliedJob.jobTitle}</Text>
-                  </View>
-                ))}
-              </View>
-            </>
-          )}
-        </>
-      )}
+      {/* applied job list  */}
+      <Text style={styles.headers}>Applied Jobs</Text>
+      {
+        appliedJobs.length > 0 
+        &&
+        <View>
+          {appliedJobs.map(job => <AppliedJobItem key={job._id} job={job} />)}
+        </View>
+      }
+        
+    
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+
+  container: {
+    padding: 20
+  }, 
   
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 10,
   },
   searchBarContainer: {
     flex: 2, // Occupy remaining space
-    marginLeft: 5, // Adjust as needed
+    marginHorizontal: 20,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: "grey",
+  },
+  input: {
+    outline: "none",
+    border: 0,
+    fontSize: 20,
+    marginLeft: 10,
+    width: "90%",
+    padding: 5,
   },
   //   messageIcon: {
   //     marginLeft: 15,
   //   },
   explore: {
-    padding: 20,
+    
     fontWeight: 'bold',
     fontSize: 26,
   },
 
   image: {
-    // padding: 20,
+    // 
     // alignItems: 'center',
     // marginLeft: 10,
     // justifyContent: 'center',
@@ -204,6 +224,16 @@ const styles = StyleSheet.create({
     // alignSelf: 'flex-start',
     borderRadius: 20,
   },
+
+
+  jobTitle: {
+    fontWeight: "bold", 
+    fontSize: 16,
+    marginTop: 10
+  }, 
+
+
+
   searchResultsContainer: {
     flex: 1, // Take up all available space
     paddingHorizontal: 20, // Add horizontal padding
@@ -211,7 +241,7 @@ const styles = StyleSheet.create({
   },
  
   jobsWrapper: {
-    padding: 20,
+    
     display: 'flex',
     flexDirection: 'row',
     gap: 20,
@@ -221,13 +251,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
-  Recommended: {
-    padding: 20,
+  headers: {
+    marginBottom: 10, 
     fontWeight: 'bold',
     fontSize: 26,
   },
+
   applicatins: {
-    padding: 20,
+    
     fontWeight: 'bold',
     fontSize: 26,
 

@@ -32,7 +32,7 @@ const SekerDetails = () => {
   const getJobDetails = async () => {
     console.log(jobId)
 
-    const url = `http://localhost:8080/jobseeker/jobDetails/${jobId}`;
+    const url = `http://localhost:8080/jobprovider/jobDetails/${jobId}`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -66,26 +66,35 @@ const SekerDetails = () => {
     getJobDetails();
   }, [isFocused])
 
-  const getJobApplied = async () => {
+
+
+  const handleOnPressApplyBtn = async () => {
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+      alert("userId does not exist");
+    }
     const url = `http://localhost:8080/jobseeker/applyJob/${userId}/${jobId}`;
-    const response = await fetch(url);
+    const options = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }
+    const response = await fetch(url, options);
     const data = await response.json();
 
     if (!response.ok) {
       alert(data.err_msg);
     }
     else {
-      setJobsArr(data.jobs)
+      console.log(data)
+      navigation.navigate('ApplyHere')
 
-      console.log(data.jobs)
     }
   }
 
 
-
-  useEffect(() => {
-    getJobApplied();
-  }, [isFocused])
 
 
 return (
@@ -117,8 +126,8 @@ return (
 
       <Text style={{ padding: 20, fontWeight: 'bold', alignSelf: 'center' }}>Intersted Candidates Can ApplyHere</Text>
 
-      <Pressable style={styles.postjobbutton} onPress={() => navigation.navigate('ApplyHere', { userEmail: 'user@example.com' })}>
-        <Text style={{ color: 'white', fontSize: 20 }}>Apply Here {getJobApplied}</Text>
+      <Pressable style={styles.postjobbutton} onPress={handleOnPressApplyBtn}>
+        <Text style={{ color: 'white', fontSize: 20 }}>Apply Here</Text>
       </Pressable>
 
 
